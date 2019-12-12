@@ -29,16 +29,13 @@ static_resources:
               "@type": type.googleapis.com/envoy.config.filter.http.lua.v2.Lua
               inline_code: |
                 local mylibrary = require("lib.mylibrary")
-              
+
                 function envoy_on_request(request_handle)
-                  print("1")
-                  request_handle:headers():add("foo", mylibrary.foobar())
+                  mylibrary.crunchIn(request_handle)
                 end
 
                 function envoy_on_response(response_handle)
-                  print("2")
-                  body_size = response_handle:body():length()
-                  response_handle:headers():add("response-body-size", tostring(body_size))
+                  mylibrary.crunchOut(response_handle)
                 end
           - name: envoy.router
             typed_config: {}
@@ -56,7 +53,8 @@ static_resources:
             address:
               socket_address:
                 address: web_service
-                port_value: 80
+                port_value: 8000
+#                port_value: 80
 
 admin:
   access_log_path: "/dev/null"

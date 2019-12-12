@@ -13,11 +13,13 @@ services:
       replicas: 1
 
   web_service:
-    image: solsson/http-echo:${DOCKER_FLOW_SWARM_LISTENER_TAG:-latest}
+    image: citizenstig/httpbin:${DOCKER_FLOW_SWARM_LISTENER_TAG:-latest}
+#   image: solsson/http-echo:${DOCKER_FLOW_SWARM_LISTENER_TAG:-latest}
     networks:
     - proxy
     ports:
-    - 8080:80
+#    - 8080:80
+    - 8080:8000
     deploy:
       replicas: 1
 
