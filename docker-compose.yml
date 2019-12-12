@@ -1,0 +1,26 @@
+version: "3.7"
+
+services:
+
+  proxy:
+    image: tourgeek/envoy:${DOCKER_FLOW_PROXY_TAG:-latest}
+    ports:
+    - 8000:80
+    - 8001:8001
+    networks:
+    - proxy
+    deploy:
+      replicas: 1
+
+  web_service:
+    image: solsson/http-echo:${DOCKER_FLOW_SWARM_LISTENER_TAG:-latest}
+    networks:
+    - proxy
+    ports:
+    - 8080:80
+    deploy:
+      replicas: 1
+
+networks:
+  proxy:
+    external: true
