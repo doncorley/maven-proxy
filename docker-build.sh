@@ -1,7 +1,7 @@
 #!/bin/sh
 
 docker stack rm proxy
-sleep 4
+sleep 2
 
 cd proxy
 docker build -t tourgeek/envoy .

@@ -1,0 +1,25 @@
+version: "3.7"
+
+services:
+
+  web_service:
+    image: sonatype/nexus3:${DOCKER_FLOW_SWARM_LISTENER_TAG:-latest}
+#   image: solsson/http-echo:${DOCKER_FLOW_SWARM_LISTENER_TAG:-latest}
+    networks:
+    - proxy
+    ports:
+    - 8081:8081
+    volumes:
+    - nexus-data:/nexus-data
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  nexus-data:
+    external: true
+    name: ${NEXUS_DATA:-nexus-data}
+networks:
+  proxy:
+    external: true

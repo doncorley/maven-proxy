@@ -22,7 +22,7 @@ static_resources:
               - match: { prefix: "/" }
                 route: 
                   auto_host_rewrite: true
-                  cluster: httpbin_service
+                  cluster: httpbin_service                  
           http_filters:
           - name: envoy.router
   clusters:
@@ -32,4 +32,4 @@ static_resources:
       # Comment out the following line to test on v6 networks
       dns_lookup_family: V4_ONLY
       lb_policy: ROUND_ROBIN
-      hosts: [{ socket_address: { address: web_server, port_value: 8081 }}]
+      hosts: [{ socket_address: { address: httpbin, port_value: 8000 }}]

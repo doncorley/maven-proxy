@@ -53,7 +53,7 @@ static_resources:
             address:
               socket_address:
                 address: web_service
-                port_value: 8000
+                port_value: 8081
 #                port_value: 80
 
 admin:

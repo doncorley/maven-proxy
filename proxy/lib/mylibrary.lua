@@ -66,7 +66,7 @@ function M.getMetadataPath(path)
 
 end
 
--- Is this path a snapshot?
+-- Is this path pointing to a snapshot resource?
 function M.isSnapshot(path)
     print("path3=" .. path)
     if (path == nil) then
