@@ -10,4 +10,7 @@ FROM envoyproxy/envoy-dev:latest
 
 COPY conf/*.yaml /etc/envoy/
 ADD lib/mylibrary.lua /lib/mylibrary.lua
+EXPOSE 80
+
 CMD /usr/local/bin/envoy -c /etc/envoy/proxy.yaml -l debug --service-cluster proxy
+# CMD /usr/local/bin/envoy -c /etc/envoy/simple.yaml -l debug --service-cluster proxy

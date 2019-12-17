@@ -1,0 +1,31 @@
+version: '3.7'
+services:
+  nexus:
+    image: sonatype/nexus3
+    ports:
+      - 8081:8081
+    networks:
+    - proxy
+    volumes:
+    - nexus-data:/nexus-data
+    deploy:
+      replicas: 1
+      labels:
+      - com.df.notify=true
+      - com.df.distribute=true
+      - com.df.serviceDomain=nexus.swarm.jbundle.org
+      - com.df.port=8081
+      - com.df.xForwardedProto=true
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+networks:
+  proxy:
+    external: true
+volumes:
+  nexus-data:
+    external: true
+    name: ${NEXUS_DATA:-nexus-data}

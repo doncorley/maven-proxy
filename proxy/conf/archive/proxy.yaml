@@ -21,7 +21,7 @@ static_resources:
               routes:
               - match:
                   prefix: "/"
-                route:
+                route: 
                   cluster: web_service
           http_filters:
           - name: envoy.lua
@@ -52,8 +52,9 @@ static_resources:
         - endpoint:
             address:
               socket_address:
-                address: httpbin
+                address: web_service
                 port_value: 8000
+#                port_value: 80
 
 admin:
   access_log_path: "/dev/null"
