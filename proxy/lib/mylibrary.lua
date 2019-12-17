@@ -59,7 +59,7 @@ end
 -- From the path, get the metadata path
 function M.getMetadataPath(path)
 
-    start = string.find (path, "%-SNAPSHOT/")
+    start = string.find(path, "%-SNAPSHOT/")
     path = string.sub(path, 1, start + 9)
 
     path = path .. "maven-metadata.xml"
@@ -71,7 +71,7 @@ end
 -- Is this path a snapshot?
 function M.isSnapshot(path)
 
-    return path ~= nil and string.find(path, "%-SNAPSHOT%.") ~= nil
+    return path ~= nil and string.find(path, "%-SNAPSHOT/") ~= nil and string.find(path, "%-SNAPSHOT%.") ~= nil
 
 end
 
