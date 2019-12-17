@@ -1,0 +1,24 @@
+version: '3.7'
+services:
+  httpbin:
+    image: citizenstig/httpbin
+    ports:
+      - 8000:8000
+    networks:
+      - proxy
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.serviceDomain=httpbin.swarm.jbundle.org
+        - com.df.port=8000
+
+networks:
+  proxy:
+    external: true

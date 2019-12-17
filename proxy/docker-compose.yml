@@ -5,12 +5,16 @@ services:
   proxy:
     image: tourgeek/envoy:${DOCKER_FLOW_PROXY_TAG:-latest}
     ports:
-    - 8080:80
-    - 8001:8001
+    - 80:80
     networks:
     - proxy
     deploy:
       replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
 
 networks:
   proxy:

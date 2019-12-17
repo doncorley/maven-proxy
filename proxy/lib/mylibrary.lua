@@ -1,83 +1,77 @@
 M = {}
 
-function M.foobar()
-
-    print("In foobar-----------------")
-
-    return "bar"
-end
-
-function M.crunchIn(request_handle)
-  print("01")
-  request_handle:headers():add("foo", M.foobar())
-  for key, value in pairs(request_handle:headers()) do
-    print("headers1 key=" .. key .. " value=" .. value)
-  end
---  print("body=" .. request_handle:body())
+-- If the incoming request is a snapshot, return the latest snapshot resource
+function M.handleRequest(request_handle)
   local path = request_handle:headers():get(":path")
-  print("headers1 xpath1=" .. path)
   if M.isSnapshot(path) then
-    print("isSnapshot " .. path)
-    M.getAlternatePage(request_handle)
+    M.requestAlternatePage(request_handle)
   end
 
 end
 
-function M.crunchOut(response_handle)
-  print("02")
-  local headers = response_handle:headers()
-  for key, value in pairs(headers) do
-    print("return headers2 key=" .. key .. " value=" .. value)
-  end
+-- No functionality currently - May be nice to do only do the snapshot retrieval on a 404
+function M.handleResponse(response_handle)
 
-  body_size = response_handle:body():length()
-  response_handle:headers():add("response-body-size", tostring(body_size))
 end
 
--- Read the alternate page for this request
-function M.getAlternatePage(request_handle)
+-- Read the actual resource for this maven snapshot request
+function M.requestAlternatePage(request_handle)
 
   local path = request_handle:headers():get(":path")
   local metadataPath = M.getMetadataPath(path)
+  print("metadataPath=" .. metadataPath)
 
+  local authority = request_handle:headers():get(":authority")
   local headers, body = request_handle:httpCall(
-  "web_service",
+  "nexus_service",
   {
     [":method"] = "GET",
     [":path"] = metadataPath,
-    [":authority"] = "web_service"
+    [":authority"] = authority
   },
   "",
   5000)
-  for key, value in pairs(headers) do
-    print("return headers3 key=" .. key .. " value=" .. value)
-  end
-  print("body3=" .. body)
 
-  request_handle:headers():replace(":path", "/headers")
+  local extension = string.sub(path, -3)
+  for i = string.len(body), 1, -1 do
+    if string.sub(path, i, i) == "." then
+        extension = string.sub(path, i+1)
+        for j = i-10, 1, -1 do
+            if string.sub(path, j, j) == "-" then
+                path = string.sub(path, 1, j)
+                break
+                end
+        end
+        break
+    end
+  end
+  local tags = "<extension>" .. extension .. "</extension>"
+  local start = string.find(body, tags, 1, true)
+  start = string.find(body, "<value>", start)
+  local last = string.find(body, "</value>", start)
+  local tag = string.sub(body, start+7, last-1)
+  path = path .. tag .. "." .. extension
+
+  request_handle:headers():replace(":path", path)
 
 end
 
 -- From the path, get the metadata path
 function M.getMetadataPath(path)
 
-    path = "/headers"
+    start = string.find(path, "%-SNAPSHOT/")
+    path = string.sub(path, 1, start + 9)
+
+    path = path .. "maven-metadata.xml"
+
     return path
 
 end
 
--- Is this path pointing to a snapshot resource?
+-- Is this path a snapshot?
 function M.isSnapshot(path)
-    print("path3=" .. path)
-    if (path == nil) then
-        return false
-    end
 
-    if path == "/headers" or path == "/status/404" then
-        return true
-    else
-        return false
-    end
+    return path ~= nil and string.find(path, "%-SNAPSHOT/") ~= nil and string.find(path, "%-SNAPSHOT%.") ~= nil
 
 end
 
