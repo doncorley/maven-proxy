@@ -1,0 +1,53 @@
+##################################################################################################
+# maven-envoy service
+##################################################################################################
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: maven
+  namespace: jx
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: maven
+  labels:
+    app: maven
+  namespace: jx
+spec:
+  ports:
+  - name: maven
+    port: 80
+    targetPort: 80
+  selector:
+    app: maven
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: maven
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: maven
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: maven
+        version: v1
+    spec:
+      serviceAccountName: maven
+      containers:
+      - image: docker.io/tourgeek/maven-envoy
+        imagePullPolicy: IfNotPresent
+        name: maven
+        ports:
+        - containerPort: 80
+        env:
+          - name: NEXUS
+            value: nexus
+      restartPolicy: Always
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet

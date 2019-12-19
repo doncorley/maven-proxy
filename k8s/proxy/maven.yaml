@@ -1,0 +1,89 @@
+##################################################################################################
+# maven-envoy service
+##################################################################################################
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: maven
+  namespace: jx
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: maven
+  labels:
+    app: maven
+  namespace: jx
+spec:
+  ports:
+  - name: maven
+    port: 80
+    targetPort: 80
+  selector:
+    app: maven
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: maven
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: maven
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: maven
+        version: v1
+    spec:
+      serviceAccountName: maven
+      containers:
+      - image: tourgeek/maven-envoy
+        imagePullPolicy: IfNotPresent
+        name: maven
+        ports:
+        - containerPort: 80
+        env:
+          - name: NEXUS
+            value: nexus
+      restartPolicy: Always
+#      hostNetwork: true
+#      dnsPolicy: ClusterFirstWithHostNet
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    certmanager.k8s.io/issuer: letsencrypt-prod
+    fabric8.io/generated-by: exposecontroller
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: "true"
+  generation: 1
+  labels:
+    provider: fabric8
+  name: maven
+  namespace: jx
+spec:
+  rules:
+  - host: maven.jx.tourgeek.com
+    http:
+      paths:
+      - backend:
+          serviceName: maven
+          servicePort: 80
+  tls:
+  - hosts:
+    - maven.jx.tourgeek.com
+    secretName: tls-maven
+status:
+  loadBalancer:
+    ingress:
+    - ip: 192.168.1.77

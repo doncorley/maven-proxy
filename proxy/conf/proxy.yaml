@@ -54,7 +54,7 @@ static_resources:
             address:
               socket_address:
                 address: nexus
-                port_value: 8081
+                port_value: 80
 
 admin:
   access_log_path: /tmp/admin_access.log

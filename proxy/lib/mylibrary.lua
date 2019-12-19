@@ -4,6 +4,7 @@ M = {}
 function M.handleRequest(request_handle)
   local path = request_handle:headers():get(":path")
   if M.isSnapshot(path) then
+    print("Is Snapshot - Path=" .. path)
     M.requestAlternatePage(request_handle)
   end
 
@@ -19,7 +20,7 @@ function M.requestAlternatePage(request_handle)
 
   local path = request_handle:headers():get(":path")
   local metadataPath = M.getMetadataPath(path)
-  print("metadataPath=" .. metadataPath)
+  print("MetadataPath=" .. metadataPath)
 
   local authority = request_handle:headers():get(":authority")
   local headers, body = request_handle:httpCall(
@@ -52,6 +53,7 @@ function M.requestAlternatePage(request_handle)
   local tag = string.sub(body, start+7, last-1)
   path = path .. tag .. "." .. extension
 
+  print("Corrected Path=" .. path)
   request_handle:headers():replace(":path", path)
 
 end
