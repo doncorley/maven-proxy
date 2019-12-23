@@ -66,6 +66,7 @@ metadata:
     fabric8.io/generated-by: exposecontroller
     kubernetes.io/ingress.class: nginx
     kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
   generation: 1
   labels:
     provider: fabric8
